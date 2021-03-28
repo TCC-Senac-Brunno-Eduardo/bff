@@ -6,6 +6,7 @@ import {
   MessagePattern,
   RmqContext,
 } from '@nestjs/microservices';
+
 @Controller()
 export class AppController {
   constructor(@Inject('MAIN_SERVICE') private readonly client: ClientProxy) {}

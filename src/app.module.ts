@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { WebsocketService } from './websocket/websocket.service';
+import { AppGateway } from './app/app.gateway';
 import { AppController } from './app/app.controller';
 
 @Module({
@@ -24,6 +24,6 @@ import { AppController } from './app/app.controller';
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
-  providers: [WebsocketService],
+  providers: [AppGateway],
 })
 export class AppModule {}
