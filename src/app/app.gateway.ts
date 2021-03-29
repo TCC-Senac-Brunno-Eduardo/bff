@@ -8,6 +8,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { AppService } from './app.service';
 
 @WebSocketGateway(3031)
 export class AppGateway
@@ -15,6 +16,7 @@ export class AppGateway
   @WebSocketServer()
   private server: Server;
   private logger: Logger = new Logger('AppGateway');
+  constructor(private readonly appService: AppService) {}
 
   afterInit(server: Server) {
     this.logger.log('Init Socket');
@@ -31,6 +33,10 @@ export class AppGateway
 
   @SubscribeMessage('messageToServer')
   handleMessage(client: Socket, payload: string): void {
-    this.server.emit('messageToClient', 'Hello from Client Server');
+    console.log('Mensagem recebida WS: ', payload);
+    this.appService.hello('Oi RabbitMQ');
+    const msgResponseWS = 'Hello from Server';
+    this.server.emit('messageToClient', msgResponseWS);
+    console.log('Mensagem enviada pro WS: ', msgResponseWS);
   }
 }

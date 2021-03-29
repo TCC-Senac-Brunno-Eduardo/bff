@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AppGateway } from './app/app.gateway';
-import { AppController } from './app/app.controller';
+import { AppGateway } from './app.gateway';
+import { AppService } from './app.service';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -24,6 +25,6 @@ import { AppController } from './app/app.controller';
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
-  providers: [AppGateway],
+  providers: [AppGateway, AppService],
 })
 export class AppModule {}
