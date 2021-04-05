@@ -1,30 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { RabbitMQ } from 'src/rabbitmq/RabbitMQ';
-import { Publisher } from 'src/rabbitmq/Publisher';
-import { Consumer } from 'src/rabbitmq/Consumer';
 
 @Injectable()
 export class AppService {
   private rabbitMQ: RabbitMQ;
-  private rabbitMQPublisher: Publisher;
-  private rabbitMQConsumer: Consumer;
+  private rabbitMQ2: RabbitMQ;
 
   constructor() {
     this.rabbitMQ = new RabbitMQ('main_queue');
+    this.rabbitMQ2 = new RabbitMQ('main_queue2');
   }
 
   async hello(data: string) {
-    this.rabbitMQPublisher = new Publisher(
-      this.rabbitMQ.getConnection(),
-      this.rabbitMQ.getQueue(),
-    );
-
-    this.rabbitMQConsumer = new Consumer(
-      this.rabbitMQ.getConnection(),
-      this.rabbitMQ.getQueue(),
-    );
-
-    this.rabbitMQPublisher.publisher(data);
-    this.rabbitMQConsumer.consumer();
+    this.rabbitMQ.publisher.publish(data);
+    this.rabbitMQ.consumer.consume();
+    this.rabbitMQ2.publisher.publish(data);
   }
 }

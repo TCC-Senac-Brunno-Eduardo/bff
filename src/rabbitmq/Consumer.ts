@@ -2,7 +2,7 @@ import { Connection } from 'amqplib/callback_api';
 
 export class Consumer {
   constructor(private conn: Connection = conn, private queue: string = queue) {}
-  consumer() {
+  consume() {
     const queue = this.queue;
     this.conn.createChannel(function (error1, channel) {
       if (error1) {

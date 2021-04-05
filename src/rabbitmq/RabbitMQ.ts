@@ -1,12 +1,19 @@
 import { connect as amqplibConect, Connection } from 'amqplib/callback_api';
+import { Consumer } from './Consumer';
+import { Publisher } from './Publisher';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class RabbitMQ {
-  private url: string;
+  private url: string = process.env.CLOUDAMQP_URL;
   private conn: Connection;
-
+  public consumer: Consumer;
+  public publisher: Publisher;
   constructor(private queue: string = queue) {
-    this.url = process.env.CLOUDAMQP_URL;
-    this.connect();
+    this.connect().then((conn) => {
+      this.consumer = new Consumer(conn, queue);
+      this.publisher = new Publisher(conn, queue);
+    });
   }
 
   private async connect(): Promise<Connection> {

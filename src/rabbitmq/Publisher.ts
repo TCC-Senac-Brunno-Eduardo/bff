@@ -11,7 +11,7 @@ export class Publisher {
     console.log(' [x] Sent %s', this.message);
   }
 
-  publisher(message: string) {
+  publish(message: string) {
     this.message = message;
     this.conn.createChannel((err, ch) => this.openChannel(err, ch));
   }
