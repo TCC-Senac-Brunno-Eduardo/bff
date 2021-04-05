@@ -1,15 +1,30 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Injectable } from '@nestjs/common';
+import { RabbitMQ } from 'src/rabbitmq/RabbitMQ';
+import { Publisher } from 'src/rabbitmq/Publisher';
+import { Consumer } from 'src/rabbitmq/Consumer';
 
 @Injectable()
 export class AppService {
-  constructor(@Inject('MAIN_SERVICE') private readonly client: ClientProxy) {}
-  async onApplicationBootstrap() {
-    await this.client.connect();
+  private rabbitMQ: RabbitMQ;
+  private rabbitMQPublisher: Publisher;
+  private rabbitMQConsumer: Consumer;
+
+  constructor() {
+    this.rabbitMQ = new RabbitMQ('main_queue');
   }
 
-  hello(data: string) {
-    console.log('Mensagem eviada para o RabbitMQ:', data);
-    this.client.emit('hello', data);
+  async hello(data: string) {
+    this.rabbitMQPublisher = new Publisher(
+      this.rabbitMQ.getConnection(),
+      this.rabbitMQ.getQueue(),
+    );
+
+    this.rabbitMQConsumer = new Consumer(
+      this.rabbitMQ.getConnection(),
+      this.rabbitMQ.getQueue(),
+    );
+
+    this.rabbitMQPublisher.publisher(data);
+    this.rabbitMQConsumer.consumer();
   }
 }
