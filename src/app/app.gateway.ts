@@ -34,9 +34,22 @@ export class AppGateway
   @SubscribeMessage('messageToServer')
   handleMessage(client: Socket, payload: string): void {
     console.log('Mensagem recebida WS: ', payload);
-    this.appService.hello('Oi RabbitMQ');
+    //this.appService.hello('Oi RabbitMQ');
     const msgResponseWS = 'Hello from Server';
     this.server.emit('messageToClient', msgResponseWS);
     console.log('Mensagem enviada pro WS: ', msgResponseWS);
+  }
+
+  @SubscribeMessage('userLocation')
+  async userLocation(client: Socket, payload: string): Promise<void> {
+    const userAddress = await this.appService.geocode(payload);
+    this.server.emit('userAddress', userAddress);
+  }
+
+  @SubscribeMessage('cityMarkers')
+  async cityRoom(client: Socket, payload: string): Promise<void> {
+    const city = payload;
+    const markers = await this.appService.markersByCity(city);
+    client.emit(city, markers);
   }
 }
