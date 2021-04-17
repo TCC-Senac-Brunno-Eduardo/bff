@@ -26,27 +26,34 @@ export class AppService {
       const location = {
         full_address: data['results'][0]['formatted_address'],
         address: data['results'][1]['formatted_address'],
-        street: data['results'][0]['address_components'].find((c) =>
-          c['types'].includes('route'),
-        ).long_name,
-        number: data['results'][0]['address_components'].find((c) =>
-          c['types'].includes('street_number'),
-        ).long_name,
-        city: data['results'][0]['address_components'].find((c) =>
-          c['types'].includes('administrative_area_level_2'),
-        ).long_name,
-        district: data['results'][0]['address_components'].find((c) =>
-          c['types'].includes('sublocality_level_1'),
-        ).long_name,
-        state: data['results'][0]['address_components'].find((c) =>
-          c['types'].includes('administrative_area_level_1'),
-        ).long_name,
-        country: data['results'][0]['address_components'].find((c) =>
-          c['types'].includes('country'),
-        ).long_name,
-        postal_code: data['results'][0]['address_components'].find((c) =>
-          c['types'].includes('postal_code'),
-        ).long_name,
+        street:
+          data['results'][0]['address_components'].find((c) =>
+            c['types'].includes('route'),
+          ).long_name || '',
+        number:
+          data['results'][0]['address_components'].find((c) =>
+            c['types'].includes('street_number'),
+          ).long_name || '',
+        city:
+          data['results'][0]['address_components'].find((c) =>
+            c['types'].includes('administrative_area_level_2'),
+          ).long_name || '',
+        district:
+          data['results'][0]['address_components'].find((c) =>
+            c['types'].includes('sublocality_level_1'),
+          ).long_name || '',
+        state:
+          data['results'][0]['address_components'].find((c) =>
+            c['types'].includes('administrative_area_level_1'),
+          ).long_name || '',
+        country:
+          data['results'][0]['address_components'].find((c) =>
+            c['types'].includes('country'),
+          ).long_name || '',
+        postal_code:
+          data['results'][0]['address_components'].find((c) =>
+            c['types'].includes('postal_code'),
+          ).long_name || '',
       };
       return location;
     } catch (error) {

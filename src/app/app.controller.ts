@@ -1,13 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 
-@Controller()
+@Controller('v1/app')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  index() {
-    this.appService.hello('Oi RabbitMQ');
-    return 'Home';
+  @Get('/reverse-geocoding/')
+  async getReverseGeocoding(@Query('lat') latitude, @Query('lng') longitude) {
+    return await this.appService.geocode({ latitude, longitude });
   }
 }
