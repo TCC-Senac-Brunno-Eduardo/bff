@@ -9,14 +9,8 @@ export class RabbitMQ {
   private conn: Connection;
   public consumer: Consumer;
   public publisher: Publisher;
-  constructor(private queue: string = queue) {
-    this.connect().then((conn) => {
-      this.consumer = new Consumer(conn, queue);
-      this.publisher = new Publisher(conn, queue);
-    });
-  }
 
-  private async connect(): Promise<Connection> {
+  async connect(): Promise<Connection> {
     return new Promise((resolve, reject) => {
       amqplibConect(this.url, async (err, conn) => {
         if (err) return reject(err);
@@ -26,11 +20,14 @@ export class RabbitMQ {
     });
   }
 
-  getConnection(): Connection {
-    return this.conn;
+  setConsumer(queue) {
+    this.consumer = new Consumer(this.conn, queue);
+  }
+  setPublisher(queue) {
+    this.publisher = new Publisher(this.conn, queue);
   }
 
-  getQueue(): string {
-    return this.queue;
+  getConnection(): Connection {
+    return this.conn;
   }
 }

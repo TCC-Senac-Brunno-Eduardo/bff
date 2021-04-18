@@ -15,4 +15,8 @@ export class Publisher {
     this.message = message;
     this.conn.createChannel((err, ch) => this.openChannel(err, ch));
   }
+
+  getQueue(): string {
+    return this.queue;
+  }
 }

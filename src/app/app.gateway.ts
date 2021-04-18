@@ -9,17 +9,28 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AppService } from './app.service';
+import { RabbitMQ } from 'src/rabbitmq/RabbitMQ';
 
 @WebSocketGateway(3031)
 export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  private server: Server;
+  public server: Server;
   private logger: Logger = new Logger('AppGateway');
-  constructor(private readonly appService: AppService) {}
+  private rabbitMQ: RabbitMQ;
+  constructor(private readonly appService: AppService) {
+    this.rabbitMQ = new RabbitMQ();
+  }
 
-  afterInit(server: Server) {
-    this.logger.log('Init Socket');
+  async afterInit() {
+    this.logger.log('Server Webscoket UP');
+    const connected = await this.rabbitMQ.connect();
+    if (connected) {
+      this.rabbitMQ.setConsumer('report_marker');
+      this.rabbitMQ.consumer.consume((data) => {
+        this.handleMarkerQueue(data);
+      });
+    }
   }
 
   handleConnection(client: Socket) {
@@ -31,13 +42,18 @@ export class AppGateway
     this.logger.log(`Client disconnect ${client.id}`);
   }
 
-  @SubscribeMessage('messageToServer')
-  handleMessage(client: Socket, payload: string): void {
-    console.log('Mensagem recebida WS: ', payload);
-    //this.appService.hello('Oi RabbitMQ');
-    const msgResponseWS = 'Hello from Server';
-    this.server.emit('messageToClient', msgResponseWS);
-    console.log('Mensagem enviada pro WS: ', msgResponseWS);
+  handleMarkerQueue(data: string) {
+    const messageReceived = JSON.parse(data);
+    switch (messageReceived.message) {
+      case 'NEW_MARKER':
+        this.server
+          .to(messageReceived.city)
+          .emit('newMarker', messageReceived.marker);
+        break;
+      default:
+        console.log('MESSAGE NÃO CADASTRADA');
+        break;
+    }
   }
 
   @SubscribeMessage('userLocation')
@@ -46,10 +62,14 @@ export class AppGateway
     this.server.emit('userAddress', userAddress);
   }
 
-  @SubscribeMessage('cityMarkers')
-  async cityRoom(client: Socket, payload: string): Promise<void> {
-    const city = payload;
+  @SubscribeMessage('room')
+  async cityRoom(client: Socket, city: string): Promise<void> {
+    client.join(city);
+  }
+
+  @SubscribeMessage('markerCity')
+  async markerCity(client: Socket, city: string): Promise<void> {
     const markers = await this.appService.markersByCity(city);
-    client.emit(city, markers);
+    client.emit('markers', markers);
   }
 }
