@@ -47,8 +47,8 @@ export class AppGateway
     switch (messageReceived.message) {
       case 'NEW_MARKER':
         this.server
-          .to(messageReceived.city)
-          .emit('newMarker', messageReceived.marker);
+          .to(messageReceived.report.city)
+          .emit('newMarker', messageReceived.report);
         break;
       default:
         console.log('MESSAGE NÃO CADASTRADA');
