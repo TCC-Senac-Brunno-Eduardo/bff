@@ -50,6 +50,11 @@ export class AppGateway
           .to(messageReceived.report.city)
           .emit('newMarker', messageReceived.report);
         break;
+      case 'DELETED_MARKER':
+        messageReceived.city.forEach((marker) => {
+          this.server.to(marker.city).emit('deletedMarker', marker.markersId);
+        });
+        break;
       default:
         console.log('MESSAGE NÃO CADASTRADA');
         break;
@@ -59,7 +64,7 @@ export class AppGateway
   @SubscribeMessage('userLocation')
   async userLocation(client: Socket, payload: string): Promise<void> {
     const userAddress = await this.appService.geocode(payload);
-    this.server.emit('userAddress', userAddress);
+    client.emit('userAddress', userAddress);
   }
 
   @SubscribeMessage('room')
