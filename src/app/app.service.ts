@@ -3,9 +3,6 @@ import axios from 'axios';
 
 @Injectable()
 export class AppService {
-  async hello() {
-    //this.rabbitMQ.consumer.consume();
-  }
 
   async geocode(coords: any) {
     try {
