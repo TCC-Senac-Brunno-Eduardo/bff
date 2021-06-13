@@ -50,6 +50,11 @@ export class AppGateway
           .to(messageReceived.report.city)
           .emit('newMarker', messageReceived.report);
         break;
+      case 'UPDATE_MARKER':
+        this.server
+          .to(messageReceived.marker.city)
+          .emit('updateMarker', messageReceived.marker);
+        break;
       case 'DELETED_MARKER':
         messageReceived.city.forEach((marker) => {
           this.server.to(marker.city).emit('deletedMarker', marker.markersId);
